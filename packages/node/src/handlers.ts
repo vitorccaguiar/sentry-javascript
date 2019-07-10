@@ -1,5 +1,4 @@
-import { captureException, getCurrentHub, withScope } from '@sentry/core';
-import { Span } from '@sentry/hub';
+import { captureException, getCurrentHub } from '@sentry/core';
 import { Event } from '@sentry/types';
 import { forget, isString, logger, normalize } from '@sentry/utils';
 import * as cookie from 'cookie';
@@ -285,7 +284,7 @@ export function errorHandler(): (
   return function sentryErrorMiddleware(
     error: MiddlewareError,
     _req: http.IncomingMessage,
-    _res: http.ServerResponse,
+    res: http.ServerResponse,
     next: (error: MiddlewareError) => void,
   ): void {
     const status = getStatusCodeFromResponse(error);
@@ -293,15 +292,10 @@ export function errorHandler(): (
       next(error);
       return;
     }
-    withScope(scope => {
-      if (_req.headers && isString(_req.headers['sentry-trace'])) {
-        const span = Span.fromTraceparent(_req.headers['sentry-trace'] as string);
-        scope.setSpan(span);
-      }
-      const eventId = captureException(error);
-      (_res as any).sentry = eventId;
-      next(error);
-    });
+
+    const eventId = captureException(error);
+    (res as any).sentry = eventId;
+    next(error);
   };
 }
 
