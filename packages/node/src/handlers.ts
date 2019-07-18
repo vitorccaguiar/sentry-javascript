@@ -271,11 +271,23 @@ function getStatusCodeFromResponse(error: MiddlewareError): number {
   return statusCode ? parseInt(statusCode as string, 10) : 500;
 }
 
+/** Returns true if response code is internal server error */
+function defaultShouldHandleError(error: MiddlewareError): boolean {
+  const status = getStatusCodeFromResponse(error);
+  return status >= 500;
+}
+
 /**
  * Express compatible error handler.
  * @see Exposed as `Handlers.errorHandler`
  */
-export function errorHandler(): (
+export function errorHandler(options?: {
+  /**
+   * Callback method deciding whether error should be captured and sent to Sentry
+   * @param error Captured middleware error
+   */
+  shouldHandleError?(error: MiddlewareError): boolean;
+}): (
   error: MiddlewareError,
   req: http.IncomingMessage,
   res: http.ServerResponse,
@@ -287,14 +299,15 @@ export function errorHandler(): (
     res: http.ServerResponse,
     next: (error: MiddlewareError) => void,
   ): void {
-    const status = getStatusCodeFromResponse(error);
-    if (status < 500) {
+    const shouldHandleError = (options && options.shouldHandleError) || defaultShouldHandleError;
+
+    if (shouldHandleError(error)) {
+      const eventId = captureException(error);
+      (res as any).sentry = eventId;
       next(error);
       return;
     }
-
-    const eventId = captureException(error);
-    (res as any).sentry = eventId;
+    
     next(error);
   };
 }
