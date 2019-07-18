@@ -2,7 +2,8 @@
 
 ## Unreleased
 
-- None
+- [hub] feat: Add more span functions (#2161)
+- [integrations] feat: Change `Tracing` integration (#2161)
 
 ## 5.5.0
 
