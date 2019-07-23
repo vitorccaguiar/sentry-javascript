@@ -220,3 +220,10 @@ export function addExceptionTypeValue(
   event.exception.values[0].type = event.exception.values[0].type || type || 'Error';
   event.exception.values[0].mechanism = event.exception.values[0].mechanism || mechanism;
 }
+
+/**
+ * Returns a timestamp in seconds with milliseconds precision.
+ */
+export function timestampWithMs(): number {
+  return new Date().getTime() / 1000;
+}
