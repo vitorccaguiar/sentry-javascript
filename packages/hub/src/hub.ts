@@ -425,6 +425,7 @@ export class Hub implements HubInterface {
     }
 
     if (passedSpan === undefined) {
+      logger.warn('There was no Span on the Scope and none was passed, do nothing.');
       // We will do nothing since nothing was passed and there is no Span on the scope.
       return undefined;
     }
