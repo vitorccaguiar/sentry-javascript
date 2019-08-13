@@ -307,7 +307,7 @@ export function errorHandler(options?: {
       next(error);
       return;
     }
-    
+
     next(error);
   };
 }
