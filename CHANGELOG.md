@@ -5,6 +5,51 @@
 - [hub] feat: Add more span functions (#2161)
 - [integrations] feat: Change `Tracing` integration (#2161)
 
+## 5.7.0-beta.0
+
+- [core] ref: Use `Promise` as the interface, but `SyncPromise` as the implementation in all the places we need `thenable` API
+- [browser] fix: Capture only failed `console.assert` calls
+- [browser] ref: Major `TraceKit` and `GlobalHandlers` refactor
+- [browser] ref: Remove _all_ required IE10-11 polyfills
+- [browser] ref: Remove `Object.assign` method usage
+- [browser] ref: Remove `Number.isNaN` method usage
+- [browser] ref: Remove `includes` method usage
+- [browser] ci: Use Galaxy S9 Plus for Android 9
+- [browser] ci: Increase timeouts and retries between Travis and BrowserStack
+- [node] feat: Extract prototyped data in `extractUserData` (#2247)
+- [node] ref: Use domain Hub detection only in Node environment
+- [integrations] feat: Use `contexts` to handle ExtraErrorData (#2208)
+- [types] fix: Breadcrumb `data` needs to be an object
+- [utils] ref: Make `Event` instances somewhat serializeable
+
+## 5.6.3
+
+- [browser] fix: Don't capture our own XHR events that somehow bubbled-up to global handler
+
+## 5.6.2
+
+- [browser] feat: Use framesToPop for InvaliantViolations in React errors (#2204)
+- [browser] fix: Apply crossorigin attribute with setAttribute tag for userReport dialog (#2196)
+- [browser] fix: Make sure that falsy values are captured in unhandledrejections (#2207)
+- [loader] fix: Loader should also retrigger falsy values as errors (#2207)
+
+## 5.6.1
+
+- [core] fix: Correctly detect when client is enabled before installing integrations (#2193)
+- [browser] ref: Loosen typings in `wrap` method
+
+## 5.6.0
+
+- [core] fix: When using enabled:false integrations shouldnt be installed (#2181)
+- [browser] feat: Add support for custom schemes to Tracekit
+- [browser] ref: Return function call result from `wrap` method
+- [browser] ref: Better UnhandledRejection messages (#2185)
+- [browser] test: Complete rewrite of Browser Integration Tests (#2176)
+- [node] feat: Add cookies as an optional property in the request handler (#2167)
+- [node] ref: Unify method name casing in breadcrumbs (#2183)
+- [integrations] feat: Add logErrors option to Vue integration (#2182)
+>>>>>>> master
+
 ## 5.5.0
 
 - [core] fix: Store processing state for each `flush` call separately (#2143)

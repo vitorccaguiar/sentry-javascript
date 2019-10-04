@@ -1,5 +1,5 @@
 import { getCurrentHub, initAndBind, Integrations as CoreIntegrations } from '@sentry/core';
-import { getGlobalObject } from '@sentry/utils';
+import { getGlobalObject, SyncPromise } from '@sentry/utils';
 
 import { BrowserOptions } from './backend';
 import { BrowserClient, ReportDialogOptions } from './client';
@@ -138,7 +138,7 @@ export function flush(timeout?: number): Promise<boolean> {
   if (client) {
     return client.flush(timeout);
   }
-  return Promise.reject(false);
+  return SyncPromise.reject(false);
 }
 
 /**
@@ -152,15 +152,17 @@ export function close(timeout?: number): Promise<boolean> {
   if (client) {
     return client.close(timeout);
   }
-  return Promise.reject(false);
+  return SyncPromise.reject(false);
 }
 
 /**
  * Wrap code within a try/catch block so the SDK is able to capture errors.
  *
  * @param fn A function to wrap.
+ *
+ * @returns The result of wrapped function call.
  */
-export function wrap(fn: Function): void {
+export function wrap(fn: Function): any {
   // tslint:disable-next-line: no-unsafe-any
-  internalWrap(fn)();
+  return internalWrap(fn)();
 }

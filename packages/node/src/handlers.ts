@@ -49,8 +49,14 @@ function extractTransaction(req: { [key: string]: any }, type: boolean | Transac
   }
 }
 
+/** Default request keys that'll be used to extract data from the request */
+const DEFAULT_REQUEST_KEYS = ['cookies', 'data', 'headers', 'method', 'query_string', 'url'];
+
 /** JSDoc */
-function extractRequestData(req: { [key: string]: any }): { [key: string]: string } {
+function extractRequestData(req: { [key: string]: any }, keys: boolean | string[]): { [key: string]: string } {
+  const request: { [key: string]: any } = {};
+  const attributes = Array.isArray(keys) ? keys : DEFAULT_REQUEST_KEYS;
+
   // headers:
   //   node, express: req.headers
   //   koa: req.header
@@ -79,37 +85,50 @@ function extractRequestData(req: { [key: string]: any }): { [key: string]: strin
   const originalUrl = (req.originalUrl || req.url) as string;
   // absolute url
   const absoluteUrl = `${protocol}://${host}${originalUrl}`;
-  // query string:
-  //   node: req.url (raw)
-  //   express, koa: req.query
-  const query = url.parse(originalUrl || '', false).query;
-  // cookies:
-  //   node, express, koa: req.headers.cookie
-  const cookies = cookie.parse(headers.cookie || '');
-  // body data:
-  //   node, express, koa: req.body
-  let data = req.body;
-  if (method === 'GET' || method === 'HEAD') {
-    if (typeof data === 'undefined') {
-      data = '<unavailable>';
-    }
-  }
-  if (data && !isString(data)) {
-    // Make sure the request body is a string
-    data = JSON.stringify(normalize(data));
-  }
 
-  // request interface
-  const request: {
-    [key: string]: any;
-  } = {
-    cookies,
-    data,
-    headers,
-    method,
-    query_string: query,
-    url: absoluteUrl,
-  };
+  attributes.forEach(key => {
+    switch (key) {
+      case 'headers':
+        request.headers = headers;
+        break;
+      case 'method':
+        request.method = method;
+        break;
+      case 'url':
+        request.url = absoluteUrl;
+        break;
+      case 'cookies':
+        // cookies:
+        //   node, express, koa: req.headers.cookie
+        request.cookies = cookie.parse(headers.cookie || '');
+        break;
+      case 'query_string':
+        // query string:
+        //   node: req.url (raw)
+        //   express, koa: req.query
+        request.query_string = url.parse(originalUrl || '', false).query;
+        break;
+      case 'data':
+        // body data:
+        //   node, express, koa: req.body
+        let data = req.body;
+        if (method === 'GET' || method === 'HEAD') {
+          if (typeof data === 'undefined') {
+            data = '<unavailable>';
+          }
+        }
+        if (data && !isString(data)) {
+          // Make sure the request body is a string
+          data = JSON.stringify(normalize(data));
+        }
+        request.data = data;
+        break;
+      default:
+        if ({}.hasOwnProperty.call(req, key)) {
+          request[key] = (req as { [key: string]: any })[key];
+        }
+    }
+  });
 
   return request;
 }
@@ -118,28 +137,34 @@ function extractRequestData(req: { [key: string]: any }): { [key: string]: strin
 const DEFAULT_USER_KEYS = ['id', 'username', 'email'];
 
 /** JSDoc */
-function extractUserData(req: { [key: string]: any }, keys: boolean | string[]): { [key: string]: string } {
-  const user: { [key: string]: string } = {};
+function extractUserData(
+  req: {
+    ip?: string;
+    connection?: {
+      remoteAddress?: string;
+    };
+    user?: {
+      [key: string]: any;
+    };
+  },
+  keys: boolean | string[],
+): { [key: string]: any } {
+  const user: { [key: string]: any } = {};
   const attributes = Array.isArray(keys) ? keys : DEFAULT_USER_KEYS;
 
   attributes.forEach(key => {
-    if ({}.hasOwnProperty.call(req.user, key)) {
-      user[key] = (req.user as { [key: string]: string })[key];
+    if (req.user && key in req.user) {
+      user[key] = req.user[key];
     }
   });
 
   // client ip:
   //   node: req.connection.remoteAddress
   //   express, koa: req.ip
-  const ip =
-    req.ip ||
-    (req.connection &&
-      (req.connection as {
-        remoteAddress?: string;
-      }).remoteAddress);
+  const ip = req.ip || (req.connection && req.connection.remoteAddress);
 
   if (ip) {
-    user.ip_address = ip as string;
+    user.ip_address = ip;
   }
 
   return user;
@@ -160,7 +185,7 @@ export function parseRequest(
     [key: string]: any;
   },
   options?: {
-    request?: boolean;
+    request?: boolean | string[];
     serverName?: boolean;
     transaction?: boolean | TransactionTypes;
     user?: boolean | string[];
@@ -187,7 +212,7 @@ export function parseRequest(
   if (options.request) {
     event.request = {
       ...event.request,
-      ...extractRequestData(req),
+      ...extractRequestData(req, options.request),
     };
   }
 
