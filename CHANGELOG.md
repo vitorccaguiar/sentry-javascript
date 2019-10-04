@@ -48,7 +48,6 @@
 - [node] feat: Add cookies as an optional property in the request handler (#2167)
 - [node] ref: Unify method name casing in breadcrumbs (#2183)
 - [integrations] feat: Add logErrors option to Vue integration (#2182)
->>>>>>> master
 
 ## 5.5.0
 
