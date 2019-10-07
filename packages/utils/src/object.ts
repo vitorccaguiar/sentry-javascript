@@ -142,14 +142,14 @@ function getWalkSource(
 }
 
 /** Calculates bytes size of input string */
-function utf8Length(value: string): number {
+function getUtf8Length(value: string): number {
   // tslint:disable-next-line:no-bitwise
   return ~-encodeURI(value).split(/%..|./).length;
 }
 
 /** Calculates bytes size of input object */
 function jsonSize(value: any): number {
-  return utf8Length(JSON.stringify(value));
+  return getUtf8Length(JSON.stringify(value));
 }
 
 /** JSDoc */
