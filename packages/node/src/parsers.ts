@@ -9,6 +9,7 @@ import * as stacktrace from './stacktrace';
 // tslint:disable-next-line:no-unsafe-any
 const DEFAULT_LINES_OF_CONTEXT: number = 7;
 const FILE_CONTENT_CACHE = new LRUMap<string, string | null>(100);
+const NODE_MODULES_CHAR_SIZE: number = 14;
 
 /**
  * Resets the file cache. Exists for testing purposes.
@@ -45,7 +46,7 @@ function getModule(filename: string, base?: string): string {
   let n = filename.lastIndexOf('/node_modules/');
   if (n > -1) {
     // /node_modules/ is 14 chars
-    return `${filename.substr(n + 14).replace(/\//g, '.')}:${file}`;
+    return `${filename.substr(n + NODE_MODULES_CHAR_SIZE).replace(/\//g, '.')}:${file}`;
   }
   // Let's see if it's a part of the main module
   // To be a part of main module, it has to share the same base
