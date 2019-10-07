@@ -124,7 +124,7 @@ export function wrap(
         sentryWrapped[property] = fn[property];
       }
     }
-  } catch (_oO) {} // tslint:disable-line:no-empty
+  } catch (e) {} // tslint:disable-line:no-empty
 
   fn.prototype = fn.prototype || {};
   sentryWrapped.prototype = fn.prototype;
@@ -157,7 +157,7 @@ export function wrap(
         },
       });
     }
-  } catch (_oO) {
+  } catch (e) {
     /*no-empty*/
   }
 
