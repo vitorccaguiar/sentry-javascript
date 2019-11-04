@@ -74,7 +74,7 @@ export class BrowserClient extends BaseClient<BrowserBackend, BrowserOptions> {
    *
    * @param options Set individual options for the dialog
    */
-  public showReportDialog(options: ReportDialogOptions = {}): void {
+  public static showReportDialog(options: ReportDialogOptions = {}): void {
     // doesn't work without a document (React Native)
     const document = getGlobalObject<Window>().document;
     if (!document) {
