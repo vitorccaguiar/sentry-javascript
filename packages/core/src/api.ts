@@ -10,8 +10,8 @@ export class API {
   /** The internally used Dsn object. */
   private readonly _dsnObject: Dsn;
   /** Create a new instance of API */
-  public constructor(public dsn: DsnLike) {
-    this._dsnObject = new Dsn(dsn);
+  public constructor(public dsn: Dsn) {
+    this._dsnObject = dsn;
   }
 
   /** Returns the Dsn object. */
