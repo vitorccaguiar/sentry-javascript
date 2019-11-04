@@ -34,16 +34,23 @@ export class BrowserBackend extends BaseBackend<BrowserOptions> {
    * @inheritDoc
    */
   protected _setupTransport(): Transport {
+    const transportOptions = getTransportOptions();
+    return getSetupTransport(transportOptions);
+  }
+  
+  private getTransportOptions() {
     if (!this._options.dsn) {
       // We return the noop transport here in case there is no Dsn.
       return super._setupTransport();
     }
 
-    const transportOptions = {
+    return {
       ...this._options.transportOptions,
       dsn: this._options.dsn,
     };
-
+  }
+  
+  private getSetupTransport(transportOptions) {
     if (this._options.transport) {
       return new this._options.transport(transportOptions);
     }
